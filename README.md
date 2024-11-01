@@ -8,3 +8,6 @@ Features:
 - Counter names
 - Setting a key to increment individual counters
 - Changing the increment amount of each counter
+
+It looks like this:
+![Screenshot of tally tool](screenshot.png)
