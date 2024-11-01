@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tally Tool</title>
+	<style>
+		body{
+			font-family: sans-serif;
+		}
+		.main-container{
+			width:100%;
+		}
+		h1 {
+			text-align: center;
+		}
+		
+		button {
+		  background-color: #0095ff;
+		  border: 1px solid transparent;
+		  border-radius: 3px;
+		  box-shadow: rgba(255, 255, 255, .4) 0 1px 0 0 inset;
+		  box-sizing: border-box;
+		  color: #fff;
+		  cursor: pointer;
+		  display: inline-block;
+		  font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+		  font-size: 13px;
+		  font-weight: 400;
+		  line-height: 1.15385;
+		  margin: 0;
+		  outline: none;
+		  padding: 8px .8em;
+		  position: relative;
+		  text-align: center;
+		  text-decoration: none;
+		  user-select: none;
+		  -webkit-user-select: none;
+		  touch-action: manipulation;
+		  vertical-align: baseline;
+		  white-space: nowrap;
+		}
+
+		button:hover,
+		button:focus {
+		  background-color: #07c;
+		}
+
+		button:focus {
+		  box-shadow: 0 0 0 4px rgba(0, 149, 255, 0);
+		}
+
+		button:active {
+		  background-color: #0064bd;
+		  box-shadow: none;
+		}
+		
+		button.red{
+			font-size: 0.75em;
+			background-color: #ff0000;
+		}
+		button.red:hover, button.remove-counter:focus{
+			background-color: #cc0000;
+		}
+		button.red:active{
+			background-color: #bd0000;
+		}
+		
+		.tallybox{     
+			display: flex;
+			justify-content: space-evenly;
+			flex-wrap: wrap;
+		}
+		.tally{
+			width:250px;
+			margin:10px;
+			display: flex;
+			flex-flow: column;
+			align-items: center;
+			border: solid 2px black;
+			padding: 5px;
+			background: #eaeafb;
+			border-radius: 3px;
+		}
+		.tally-title{
+			text-align:center;
+			font-size: 1em;
+			height: 26px;
+		}
+		.tally-title:focus{
+			background: yellow;
+		}
+		.flex{
+			display: flex;
+			justify-content:center;
+			align-items:center;
+		}
+		.flex.top{
+			justify-content: flex-start;
+			width: 100%;
+			padding: 5px 5px;
+			margin-top: -5px;
+			background-color: #e1e1e1;
+		}
+		.flex.top2{
+			justify-content: flex-start;
+			width: 100%;
+			padding-top:10px;
+			padding: 5px 5px;
+			margin-top: -5px;
+			background-color: #e1e1e1;
+		}
+		.flex.bottom{
+			padding-bottom: 20px;
+		}
+		.count{
+		    margin: 0.8em 0 1.1em 0;
+			font-size:5em;
+		}
+		.current-key{
+			margin: 0 5px;
+			font-size: 1.5em;
+		}
+		.add-counter{
+			bottom:0;
+			padding-top:40px;
+			justify-content: center;
+		}
+		.increment, .decrement{
+			margin: 0 5px;
+			width: 75px;
+			font-size: 2em;
+			height: 70px;
+		}
+		.increment-by{
+			width: 50px;
+			margin-left: 10px;
+		}
+		.reset, .remove-counter{
+			margin-left:auto;
+		}
+	</style>
+</head>
+<body>
+<div class="main-container">
+	<h1>Tally Tool</h1>
+	<div class="flex tallybox" id="tallybox">
+		<div class="flex tally" id="tally1" setkey="ArrowUp">
+			<div class="flex top">
+				<input class="tally-title" type="text" value="Counter #1">
+				<button class="remove-counter red" title="Remove counter" onclick="removeCounter(this);">X</button>
+			</div>
+			<div class="flex top2">
+				<button class="register-key" onclick="setKey(this);">Set Key</button>
+				<div class="current-key"> <b>:</b> ArrowUp</div>
+			</div>
+			<div class="flex top2">
+				<label for="increment-by1" class="increment-label">Increment: </label>
+				<input type="number" name="increment-by1" class="increment-by" value="1">
+			</div>
+			<pre class="count">0</pre>
+			<div class="flex bottom">
+				<button class="decrement" onclick="decrement(this);">-</button>
+				<button class="increment" onclick="increment(this);">+</button>
+			</div>
+			<button class="reset red" onclick="resetCount(this);">Reset</button>
+		</div>
+	</div>
+	<div class="flex add-counter">
+		<button class="add-tally" onclick="addTally(this);">Add Counter</button>
+		<button class="reset red" style="position:absolute; right:25px;" onclick="resetAll(this);">Reset All Counts</button>
+	</div>
+	<div style="position:absolute; bottom:0; font-size: small;">Copywrong 2024 by Ryan Gartman</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function(event) {
+
+var count = 0;
+window.addEventListener(
+  "keydown",
+  (event) => {
+	if(event.repeat) return;
+	// Increment any counters set to this key. 
+	// TO DO: Don't let them hold the key to increment so fast.
+	document.querySelectorAll('[setkey="' + event.key + '"]').forEach((e) => {
+		if ( document.activeElement.className == 'tally-title') return;
+		var count = e.querySelector('.count');
+		var currentcount = parseFloat(count.innerHTML);
+		var incrementBy = parseFloat(e.querySelector('.increment-by').value);
+		var numb = currentcount + incrementBy;
+		numb = +numb.toFixed(2);
+		count.innerHTML = numb;
+		event.preventDefault();
+	});
+
+  },
+  true,
+);
+/* Clicking didn't work, so it's commented out.
+window.addEventListener(
+  "click",
+  (event) => {
+	// TO DO: add an increment-by field
+	// TO DO: Don't let them hold the key to increment so fast.
+	document.querySelectorAll('[setkey="click"]').forEach((e) => {
+	console.log(e);
+		if(["button", "input"].includes(e.type) === false){
+			var count = e.querySelector('.count');
+			var currentcount = parseFloat(count.innerHTML);
+			count.innerHTML = currentcount + 1;
+		}
+	});
+  },
+  true,
+); */
+});
+
+function setKey(e){
+	var thisSetKey = e;
+	var currentKey = e.parentElement.querySelector('.current-key'); 
+	
+	e.innerHTML = "Press a Key...";
+	e.addEventListener("keydown", updateKey, true);
+	window.addEventListener("click", doNothing, true);
+//	window.addEventListener("click", updateKey, true);
+	function doNothing(event){
+		e.focus(); // Keep the Set Key button in focus when clicking
+		event.preventDefault();
+	}
+	function updateKey(keyevent) {
+		const keyNames = [{key: " ", name:"Space"},{key:"	", name:"Tab"}];
+		var thisSetKey2 = thisSetKey;
+		if(keyevent instanceof MouseEvent){
+		/*	keyName = 'Click';
+			thisSetKey.blur();
+			thisSetKey.parentElement.querySelector('.current-key').innerHTML = keyName;
+			thisSetKey.parentElement.parentElement.setAttribute('setkey', 'click');
+			thisSetKey.removeEventListener("keydown", updateKey, true);
+			thisSetKey.removeEventListener("click", updateKey, true); */
+			keyevent.preventDefault(); 
+			return;
+		} 
+	
+		var keyName = keyevent.key;
+		for(var i = 0, len = keyNames.length; i < len; i++){
+			if(keyNames[i].key == keyName){
+				keyName = keyNames[i].name;
+				break;
+			}
+		}
+		thisSetKey2.blur();
+		thisSetKey2.parentElement.querySelector('.current-key').innerHTML = ' <b>:</b> ' + keyName;
+		thisSetKey2.parentElement.parentElement.setAttribute('setkey', keyevent.key);
+		thisSetKey2.removeEventListener("keydown", updateKey, true);
+		window.removeEventListener("click", doNothing, true);
+	//	thisSetKey.removeEventListener("click", updateKey, true);
+		thisSetKey2.innerHTML = 'Set Key';
+	}
+}
+
+function increment(e){
+	var count = e.parentElement.parentElement.querySelector('.count');
+	var currentcount = parseFloat(count.innerHTML);
+	var incrementBy = parseFloat(e.parentElement.parentElement.querySelector('.increment-by').value);
+	var numb = currentcount + incrementBy;
+	numb = +numb.toFixed(2);
+	count.innerHTML = numb;
+}
+function decrement(e){
+	var count = e.parentElement.parentElement.querySelector('.count');
+	var currentcount = parseFloat(count.innerHTML);
+	var incrementBy = parseFloat(e.parentElement.parentElement.querySelector('.increment-by').value);
+	var numb = currentcount - incrementBy;
+	numb = +numb.toFixed(2);
+	count.innerHTML = numb;
+}
+function resetCount(e){ // TO DO: make this have a confirmation
+	var count = e.parentElement.querySelector('.count');
+	count.innerHTML = 0;
+}
+function resetAll(){
+	document.querySelectorAll('.count').forEach((e) => {
+		e.innerHTML = 0;
+	});
+}
+function removeCounter(e){ // TO DO: make this have a confirmation
+	var numOfTallies = document.querySelectorAll('.tally').length;
+	if(numOfTallies > 1){
+		e.parentElement.parentElement.remove();
+	}
+}
+function addTally(e){
+	var firstTally = document.getElementById('tally1');
+	var newtally = firstTally.cloneNode(true);
+	var numOfTallies = document.querySelectorAll('.tally').length;
+	newtally.id = 'tally' + (numOfTallies + 1);
+	newtally.querySelector('.tally-title').value = "Counter #" + (numOfTallies + 1)
+	newtally.querySelector('.count').innerHTML = 0;	
+	newtally.querySelector('.current-key').innerHTML = ' <b>:</b> ArrowUp';
+	newtally.setAttribute('setkey', 'ArrowUp');
+	newtally.querySelector('.increment-by').value = 1;
+	newtally.querySelector('.increment-by').setAttribute('name', 'increment-by' + (numOfTallies + 1));
+	newtally.querySelector('.increment-label').setAttribute('for', 'increment-by' + (numOfTallies + 1));
+	document.getElementById('tallybox').appendChild(newtally);
+}
+
+</script>
+</body>
+</html>
